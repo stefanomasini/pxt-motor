@@ -2,7 +2,7 @@
  * @file pxt-motor/main.ts
  * @brief DFRobot's microbit motor drive makecode library.
  * @n [Get the module here](http://www.dfrobot.com.cn/goods-1577.html)
- * @n This is the microbit special motor drive library, which realizes control 
+ * @n This is the microbit special motor drive library, which realizes control
  *    of the eight-channel steering gear, two-step motor and four-way dc motor.
  *
  * @copyright	[DFRobot](http://www.dfrobot.com), 2016
@@ -16,48 +16,48 @@
 /**
  *This is DFRobot:motor user motor and steering control function.
  */
-//% weight=10 color=#DF6721 icon="\uf013" block="DF-Driver"
+//% weight=10 color=#DF6721 icon="\uf013" block="Microturtle"
 namespace motor {
-    const PCA9685_ADDRESS = 0x40
-    const MODE1 = 0x00
-    const MODE2 = 0x01
-    const SUBADR1 = 0x02
-    const SUBADR2 = 0x03
-    const SUBADR3 = 0x04
-    const PRESCALE = 0xFE
-    const LED0_ON_L = 0x06
-    const LED0_ON_H = 0x07
-    const LED0_OFF_L = 0x08
-    const LED0_OFF_H = 0x09
-    const ALL_LED_ON_L = 0xFA
-    const ALL_LED_ON_H = 0xFB
-    const ALL_LED_OFF_L = 0xFC
-    const ALL_LED_OFF_H = 0xFD
+    const PCA9685_ADDRESS = 0x40;
+    const MODE1 = 0x00;
+    const MODE2 = 0x01;
+    const SUBADR1 = 0x02;
+    const SUBADR2 = 0x03;
+    const SUBADR3 = 0x04;
+    const PRESCALE = 0xFE;
+    const LED0_ON_L = 0x06;
+    const LED0_ON_H = 0x07;
+    const LED0_OFF_L = 0x08;
+    const LED0_OFF_H = 0x09;
+    const ALL_LED_ON_L = 0xFA;
+    const ALL_LED_ON_H = 0xFB;
+    const ALL_LED_OFF_L = 0xFC;
+    const ALL_LED_OFF_H = 0xFD;
 
-    const STP_CHA_L = 2047
-    const STP_CHA_H = 4095
+    const STP_CHA_L = 2047;
+    const STP_CHA_H = 4095;
 
-    const STP_CHB_L = 1
-    const STP_CHB_H = 2047
+    const STP_CHB_L = 1;
+    const STP_CHB_H = 2047;
 
-    const STP_CHC_L = 1023
-    const STP_CHC_H = 3071
+    const STP_CHC_L = 1023;
+    const STP_CHC_H = 3071;
 
-    const STP_CHD_L = 3071
-    const STP_CHD_H = 1023
+    const STP_CHD_L = 3071;
+    const STP_CHD_H = 1023;
 
 
-    const BYG_CHA_L = 3071
-    const BYG_CHA_H = 1023
+    const BYG_CHA_L = 3071;
+    const BYG_CHA_H = 1023;
 
-    const BYG_CHB_L = 1023
-    const BYG_CHB_H = 3071
+    const BYG_CHB_L = 1023;
+    const BYG_CHB_H = 3071;
 
-    const BYG_CHC_L = 4095
-    const BYG_CHC_H = 2047
+    const BYG_CHC_L = 4095;
+    const BYG_CHC_H = 2047;
 
-    const BYG_CHD_L = 2047
-    const BYG_CHD_H = 4095
+    const BYG_CHD_L = 2047;
+    const BYG_CHD_H = 4095;
 
     /**
      * The user can choose the step motor model.
@@ -113,29 +113,28 @@ namespace motor {
 
 
 
-    let initialized = false
+    let initialized = false;
 
     function i2cWrite(addr: number, reg: number, value: number) {
-        let buf = pins.createBuffer(2)
-        buf[0] = reg
-        buf[1] = value
-        pins.i2cWriteBuffer(addr, buf)
+        let buf = pins.createBuffer(2);
+        buf[0] = reg;
+        buf[1] = value;
+        pins.i2cWriteBuffer(addr, buf);
     }
 
     function i2cCmd(addr: number, value: number) {
-        let buf = pins.createBuffer(1)
-        buf[0] = value
-        pins.i2cWriteBuffer(addr, buf)
+        let buf = pins.createBuffer(1);
+        buf[0] = value;
+        pins.i2cWriteBuffer(addr, buf);
     }
 
     function i2cRead(addr: number, reg: number) {
         pins.i2cWriteNumber(addr, reg, NumberFormat.UInt8BE);
-        let val = pins.i2cReadNumber(addr, NumberFormat.UInt8BE);
-        return val;
+        return pins.i2cReadNumber(addr, NumberFormat.UInt8BE);
     }
 
     function initPCA9685(): void {
-        i2cWrite(PCA9685_ADDRESS, MODE1, 0x00)
+        i2cWrite(PCA9685_ADDRESS, MODE1, 0x00);
         setFreq(50);
         initialized = true
     }
@@ -350,11 +349,11 @@ namespace motor {
         Degree = Math.abs(Degree);
         basic.pause((1000 * Degree) / 360);
         if (index == 1) {
-            motorStop(1)
-            motorStop(2)
+            motorStop(1);
+            motorStop(2);
         } else {
-            motorStop(3)
-            motorStop(4)
+            motorStop(3);
+            motorStop(4);
         }
         //setFreq(50);
     }
@@ -497,7 +496,7 @@ namespace motor {
     */
     //% weight=20
     //% blockId=motor_motorStop block="Motor stop|%index"
-    //% index.fieldEditor="gridpicker" index.fieldOptions.columns=2 
+    //% index.fieldEditor="gridpicker" index.fieldOptions.columns=2
     export function motorStop(index: Motors) {
         setPwm((4 - index) * 2, 0, 0);
         setPwm((4 - index) * 2 + 1, 0, 0);

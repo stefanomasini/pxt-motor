@@ -359,19 +359,27 @@ namespace motor {
     }
 
     /**
-	 * Execute a 28BYJ-48 step motor(Turn).
-     * M1_M2/M3_M4.
+	 * Run two steppers at the same time.
     */
     //% weight=50
-    //% blockId=motor_stepperTurn_28 block="Stepper 28|%index|dir|%direction|turn|%turn"
-    //% index.fieldEditor="gridpicker" index.fieldOptions.columns=2
+    //% blockId=motor_twoSteppers block="Two Steppers|%direction|degree|%degree"
     //% direction.fieldEditor="gridpicker" direction.fieldOptions.columns=2
-    export function stepperTurn_28(index: Steppers, direction: Dir, turn: number): void {
-        if (turn == 0) {
+    export function twoSteppers(index: Steppers, direction: Dir, degree: number): void {
+        if (!initialized) {
+            initPCA9685()
+        }
+        if (degree == 0) {
             return;
         }
-        let degree = turn * 360;
-        stepperDegree_28(index, direction, degree);
+        let Degree = Math.abs(degree);
+        Degree = Degree * direction;
+        //setFreq(100);
+        setStepper_28(0x1, Degree > 0);
+        setStepper_28(0x2, Degree > 0);
+        Degree = Math.abs(Degree);
+        basic.pause((1000 * Degree) / 360);
+        motorStopAll();
+        //setFreq(50);
     }
 
     /**
@@ -464,31 +472,6 @@ namespace motor {
         } else {
             //
         }
-    }
-
-    /**
-	 * Two parallel stepper motors are executed simultaneously(Turn).
-    */
-    //% weight=30
-    //% blockId=motor_stepperTurnDual_42 block="Dual Stepper %stepper|M1_M2 dir %direction1|trun %trun1|M3_M4 dir %direction2|trun %trun2"
-    //% stepper.fieldEditor="gridpicker" stepper.fieldOptions.columns=2
-    //% direction1.fieldEditor="gridpicker" direction1.fieldOptions.columns=2
-    //% direction2.fieldEditor="gridpicker" direction2.fieldOptions.columns=2
-    export function stepperTurnDual_42(stepper: Stepper, direction1: Dir, trun1: number, direction2: Dir, trun2: number): void {
-        if ((trun1 == 0) && (trun2 == 0)) {
-            return;
-        }
-        let degree1 = trun1 * 360;
-        let degree2 = trun2 * 360;
-
-        if (stepper == 1) {
-            stepperDegreeDual_42(stepper, direction1, degree1, direction2, degree2);
-        } else if (stepper == 2) {
-            stepperDegreeDual_42(stepper, direction1, degree1, direction2, degree2);
-        } else {
-
-        }
-
     }
 
     /**

@@ -375,7 +375,7 @@ namespace motor {
         Degree = Degree * direction;
         //setFreq(100);
         setStepper_28(0x1, Degree > 0);
-        setStepper_28(0x2, Degree > 0);
+        setStepper_28(0x2, !(Degree > 0));
         Degree = Math.abs(Degree);
         basic.pause((1000 * Degree) / 360);
         motorStopAll();

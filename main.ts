@@ -364,7 +364,7 @@ namespace motor {
     //% weight=50
     //% blockId=motor_twoSteppers block="Two Steppers|%direction|degree|%degree"
     //% direction.fieldEditor="gridpicker" direction.fieldOptions.columns=2
-    export function twoSteppers(index: Steppers, direction: Dir, degree: number): void {
+    export function twoSteppers(direction: Dir, degree: number): void {
         if (!initialized) {
             initPCA9685()
         }

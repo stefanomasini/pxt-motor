@@ -200,9 +200,7 @@ namespace motor {
 
 
     /**
-	 * Steering gear control function.
-     * S1~S8.
-     * 0°~180°.
+	 * Pen up and down
 	*/
     //% blockId=motor_servo block="Servo|%index|degree|%degree"
     //% weight=100
@@ -219,11 +217,12 @@ namespace motor {
 
 
     /**
-	 * Run two steppers at the same time.
+	 * Run wheels
     */
     //% weight=50
-    //% blockId=motor_twoSteppers block="Two Steppers|%direction|degree|%degree"
+    //% blockId=motor_wheels block="Wheels|%direction|ms|%ms"
     //% direction.fieldEditor="gridpicker" direction.fieldOptions.columns=2
+    //% ms.min=0 ms.max=10000
     export function wheels(direction: Dir, ms: number): void {
         if (!initialized) {
             initPCA9685()

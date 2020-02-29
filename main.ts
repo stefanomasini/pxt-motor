@@ -9,14 +9,14 @@
  * @copyright	GNU Lesser General Public License
  *
  * @author [email](1035868977@qq.com)
- * @version  V1.0.4
+ * @version  V1.0.5
  * @date  2018-03-20
  */
 
 /**
  *This is DFRobot:motor user motor and steering control function.
  */
-//% weight=10 color=#DF6721 icon="\uf013" block="Microturtle"
+//% weight=10 color=#DF6721 icon="\uf304" block="Microturtle"
 namespace motor {
     const PCA9685_ADDRESS = 0x40;
     const MODE1 = 0x00;
@@ -202,8 +202,9 @@ namespace motor {
     /**
 	 * Pen up and down
 	*/
-    //% blockId=motor_servo block="Servo|%index|degree|%degree"
+    //% blockId=motor_servo
     //% weight=100
+    //% block="Servo %degree degree"
     //% degree.min=30 degree.max=155
     export function servo(degree: number): void {
         if (!initialized) {
@@ -220,7 +221,7 @@ namespace motor {
 	 * Run wheels
     */
     //% weight=50
-    //% blockId=motor_wheels block="Wheels|%direction|ms|%ms"
+    //% blockId=motor_wheels block="Wheels %direction ms %ms"
     //% direction.fieldEditor="gridpicker" direction.fieldOptions.columns=2
     //% ms.min=0 ms.max=10000
     export function wheels(direction: Dir, ms: number): void {

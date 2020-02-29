@@ -9,7 +9,7 @@
  * @copyright	GNU Lesser General Public License
  *
  * @author [email](1035868977@qq.com)
- * @version  V1.0.2
+ * @version  V1.0.3
  * @date  2018-03-20
  */
 
@@ -198,34 +198,6 @@ namespace motor {
     }
 
 
-    function setStepper_42(index: number, dir: boolean): void {
-        if (index == 1) {
-            if (dir) {
-                setPwm(7, BYG_CHA_L, BYG_CHA_H);
-                setPwm(6, BYG_CHB_L, BYG_CHB_H);
-                setPwm(5, BYG_CHC_L, BYG_CHC_H);
-                setPwm(4, BYG_CHD_L, BYG_CHD_H);
-            } else {
-                setPwm(7, BYG_CHC_L, BYG_CHC_H);
-                setPwm(6, BYG_CHD_L, BYG_CHD_H);
-                setPwm(5, BYG_CHA_L, BYG_CHA_H);
-                setPwm(4, BYG_CHB_L, BYG_CHB_H);
-            }
-        } else {
-            if (dir) {
-                setPwm(3, BYG_CHA_L, BYG_CHA_H);
-                setPwm(2, BYG_CHB_L, BYG_CHB_H);
-                setPwm(1, BYG_CHC_L, BYG_CHC_H);
-                setPwm(0, BYG_CHD_L, BYG_CHD_H);
-            } else {
-                setPwm(3, BYG_CHC_L, BYG_CHC_H);
-                setPwm(2, BYG_CHD_L, BYG_CHD_H);
-                setPwm(1, BYG_CHA_L, BYG_CHA_H);
-                setPwm(0, BYG_CHB_L, BYG_CHB_H);
-            }
-        }
-    }
-
 
     /**
 	 * Steering gear control function.
@@ -234,129 +206,17 @@ namespace motor {
 	*/
     //% blockId=motor_servo block="Servo|%index|degree|%degree"
     //% weight=100
-    //% degree.min=0 degree.max=180
-    //% index.fieldEditor="gridpicker" index.fieldOptions.columns=4
-    export function servo(index: Servos, degree: number): void {
+    //% degree.min=30 degree.max=155
+    export function servo(degree: number): void {
         if (!initialized) {
             initPCA9685()
         }
         // 50hz
-        let v_us = (degree * 1800 / 180 + 600) // 0.6ms ~ 2.4ms
-        let value = v_us * 4096 / 20000
-        setPwm(index + 7, 0, value)
+        let v_us = (degree * 1800 / 180 + 600); // 0.6ms ~ 2.4ms
+        let value = v_us * 4096 / 20000;
+        setPwm(Servos.S1 + 7, 0, value);
     }
 
-    /**
-	 * Execute a motor
-     * M1~M4.
-     * speed(0~255).
-    */
-    //% weight=90
-    //% blockId=motor_MotorRun block="Motor|%index|dir|%Dir|speed|%speed"
-    //% speed.min=0 speed.max=255
-    //% index.fieldEditor="gridpicker" index.fieldOptions.columns=2
-    //% direction.fieldEditor="gridpicker" direction.fieldOptions.columns=2
-    export function MotorRun(index: Motors, direction: Dir, speed: number): void {
-        if (!initialized) {
-            initPCA9685()
-        }
-        speed = speed * 16 * direction; // map 255 to 4096
-        if (speed >= 4096) {
-            speed = 4095
-        }
-        if (speed <= -4096) {
-            speed = -4095
-        }
-        if (index > 4 || index <= 0)
-            return
-        let pn = (4 - index) * 2
-        let pp = (4 - index) * 2 + 1
-        if (speed >= 0) {
-            setPwm(pp, 0, speed)
-            setPwm(pn, 0, 0)
-        } else {
-            setPwm(pp, 0, 0)
-            setPwm(pn, 0, -speed)
-        }
-    }
-
-    /**
-	 * Execute a 42BYGH1861A-C step motor(Degree).
-     * M1_M2/M3_M4.
-    */
-    //% weight=80
-    //% blockId=motor_stepperDegree_42 block="Stepper 42|%index|dir|%direction|degree|%degree"
-    //% index.fieldEditor="gridpicker" index.fieldOptions.columns=2
-    //% direction.fieldEditor="gridpicker" direction.fieldOptions.columns=2
-    export function stepperDegree_42(index: Steppers, direction: Dir, degree: number): void {
-        if (!initialized) {
-            initPCA9685()
-        }
-        // let Degree = Math.abs(degree);
-        // Degree = Degree * direction;
-        //setFreq(100);
-        setStepper_42(index, direction > 0);
-        if (degree == 0) {
-            return;
-        }
-        let Degree = Math.abs(degree);
-        basic.pause((50000 * Degree) / (360 * 100));  //100hz
-        if (index == 1) {
-            motorStop(1)
-            motorStop(2)
-        } else {
-            motorStop(3)
-            motorStop(4)
-        }
-        //setFreq(50);
-    }
-
-    /**
-	 * Execute a 42BYGH1861A-C step motor(Turn).
-     * M1_M2/M3_M4.
-    */
-    //% weight=70
-    //% blockId=motor_stepperTurn_42 block="Stepper 42|%index|dir|%direction|turn|%turn"
-    //% index.fieldEditor="gridpicker" index.fieldOptions.columns=2
-    //% direction.fieldEditor="gridpicker" direction.fieldOptions.columns=2
-    export function stepperTurn_42(index: Steppers, direction: Dir, turn: number): void {
-        if (turn == 0) {
-            return;
-        }
-        let degree = turn * 360;
-        stepperDegree_42(index, direction, degree);
-    }
-
-    /**
-	 * Execute a 28BYJ-48 step motor(Degree).
-     * M1_M2/M3_M4.
-    */
-    //% weight=60
-    //% blockId=motor_stepperDegree_28 block="Stepper 28|%index|dir|%direction|degree|%degree"
-    //% index.fieldEditor="gridpicker" index.fieldOptions.columns=2
-    //% direction.fieldEditor="gridpicker" direction.fieldOptions.columns=2
-    export function stepperDegree_28(index: Steppers, direction: Dir, degree: number): void {
-        if (!initialized) {
-            initPCA9685()
-        }
-        if (degree == 0) {
-            return;
-        }
-        let Degree = Math.abs(degree);
-        Degree = Degree * direction;
-        //setFreq(100);
-        setStepper_28(index, Degree > 0);
-        Degree = Math.abs(Degree);
-        basic.pause((1000 * Degree) / 360);
-        if (index == 1) {
-            motorStop(1);
-            motorStop(2);
-        } else {
-            motorStop(3);
-            motorStop(4);
-        }
-        //setFreq(50);
-    }
 
     /**
 	 * Run two steppers at the same time.
@@ -364,133 +224,24 @@ namespace motor {
     //% weight=50
     //% blockId=motor_twoSteppers block="Two Steppers|%direction|degree|%degree"
     //% direction.fieldEditor="gridpicker" direction.fieldOptions.columns=2
-    export function twoSteppers(direction: Dir, degree: number): void {
+    export function wheels(direction: Dir, ms: number): void {
         if (!initialized) {
             initPCA9685()
         }
-        if (degree == 0) {
-            return;
-        }
-        let Degree = Math.abs(degree);
-        Degree = Degree * direction;
-        //setFreq(100);
-        setStepper_28(0x1, Degree > 0);
-        setStepper_28(0x2, !(Degree > 0));
-        Degree = Math.abs(Degree);
-        basic.pause((1000 * Degree) / 360);
+        setStepper_28(0x1, direction == Dir.CW);
+        setStepper_28(0x2, direction != Dir.CW);
+        basic.pause(ms);
         motorStopAll();
-        //setFreq(50);
     }
 
-    /**
-	 * Two parallel stepper motors are executed simultaneously(DegreeDual).
-    */
-    //% weight=40
-    //% blockId=motor_stepperDegreeDual_42 block="Dual Stepper %stepper|M1_M2 dir %direction1|degree %degree1|M3_M4 dir %direction2|degree %degree2"
-    //% stepper.fieldEditor="gridpicker" stepper.fieldOptions.columns=2
-    //% direction1.fieldEditor="gridpicker" direction1.fieldOptions.columns=2
-    //% direction2.fieldEditor="gridpicker" direction2.fieldOptions.columns=2
-    export function stepperDegreeDual_42(stepper: Stepper, direction1: Dir, degree1: number, direction2: Dir, degree2: number): void {
-        if (!initialized) {
-            initPCA9685()
-        }
-        let timeout1 = 0;
-        let timeout2 = 0;
-        let Degree1 = Math.abs(degree1);
-        let Degree2 = Math.abs(degree2);
 
-        if (stepper == 1) {  // 42 stepper
-            if (Degree1 == 0 && Degree2 == 0) {
-                setStepper_42(0x01, direction1 > 0);
-                setStepper_42(0x02, direction2 > 0);
-            } else if ((Degree1 == 0) && (Degree2 > 0)) {
-                timeout1 = (50000 * Degree2) / (360 * 100)
-                setStepper_42(0x01, direction1 > 0);
-                setStepper_42(0x02, direction2 > 0);
-                basic.pause(timeout1);
-                motorStop(3); motorStop(4);
-            } else if ((Degree2 == 0) && (Degree1 > 0)) {
-                timeout1 = (50000 * Degree1) / (360 * 100)
-                setStepper_42(0x01, direction1 > 0);
-                setStepper_42(0x02, direction2 > 0);
-                basic.pause(timeout1);
-                motorStop(1); motorStop(2);
-            } else if ((Degree2 > Degree1)) {
-                timeout1 = (50000 * Degree1) / (360 * 100)
-                timeout2 = (50000 * (Degree2 - Degree1)) / (360 * 100)
-                setStepper_42(0x01, direction1 > 0);
-                setStepper_42(0x02, direction2 > 0);
-                basic.pause(timeout1);
-                motorStop(1); motorStop(2);
-                basic.pause(timeout2);
-                motorStop(3); motorStop(4);
-            } else if ((Degree2 < Degree1)) {
-                timeout1 = (50000 * Degree2) / (360 * 100)
-                timeout2 = (50000 * (Degree1 - Degree2)) / (360 * 100)
-                setStepper_42(0x01, direction1 > 0);
-                setStepper_42(0x02, direction2 > 0);
-                basic.pause(timeout1);
-                motorStop(3); motorStop(4);
-                basic.pause(timeout2);
-                motorStop(1); motorStop(2);
-            }
-        } else if (stepper == 2) {
-            if (Degree1 == 0 && Degree2 == 0) {
-                setStepper_28(0x01, direction1 > 0);
-                setStepper_28(0x02, direction2 > 0);
-            } else if ((Degree1 == 0) && (Degree2 > 0)) {
-                timeout1 = (50000 * Degree2) / (360 * 100)
-                setStepper_28(0x01, direction1 > 0);
-                setStepper_28(0x02, direction2 > 0);
-                basic.pause(timeout1);
-                motorStop(3); motorStop(4);
-            } else if ((Degree2 == 0) && (Degree1 > 0)) {
-                timeout1 = (50000 * Degree1) / (360 * 100)
-                setStepper_28(0x01, direction1 > 0);
-                setStepper_28(0x02, direction2 > 0);
-                basic.pause(timeout1);
-                motorStop(1); motorStop(2);
-            } else if ((Degree2 > Degree1)) {
-                timeout1 = (50000 * Degree1) / (360 * 100)
-                timeout2 = (50000 * (Degree2 - Degree1)) / (360 * 100)
-                setStepper_28(0x01, direction1 > 0);
-                setStepper_28(0x02, direction2 > 0);
-                basic.pause(timeout1);
-                motorStop(1); motorStop(2);
-                basic.pause(timeout2);
-                motorStop(3); motorStop(4);
-            } else if ((Degree2 < Degree1)) {
-                timeout1 = (50000 * Degree2) / (360 * 100)
-                timeout2 = (50000 * (Degree1 - Degree2)) / (360 * 100)
-                setStepper_28(0x01, direction1 > 0);
-                setStepper_28(0x02, direction2 > 0);
-                basic.pause(timeout1);
-                motorStop(3); motorStop(4);
-                basic.pause(timeout2);
-                motorStop(1); motorStop(2);
-            }
-        } else {
-            //
-        }
-    }
-
-    /**
-	 * Stop the dc motor.
-    */
-    //% weight=20
-    //% blockId=motor_motorStop block="Motor stop|%index"
-    //% index.fieldEditor="gridpicker" index.fieldOptions.columns=2
-    export function motorStop(index: Motors) {
+    function motorStop(index: Motors) {
         setPwm((4 - index) * 2, 0, 0);
         setPwm((4 - index) * 2 + 1, 0, 0);
     }
 
-    /**
-	 * Stop all motors
-    */
-    //% weight=10
-    //% blockId=motor_motorStopAll block="Motor Stop All"
-    export function motorStopAll(): void {
+
+    function motorStopAll(): void {
         for (let idx = 1; idx <= 4; idx++) {
             motorStop(idx);
         }

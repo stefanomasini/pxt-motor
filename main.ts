@@ -9,7 +9,7 @@
  * @copyright	GNU Lesser General Public License
  *
  * @author [email](1035868977@qq.com)
- * @version  V1.0.6
+ * @version  V1.0.7
  * @date  2018-03-20
  */
 
@@ -62,7 +62,7 @@ namespace motor {
     /**
      * The user can choose the step motor model.
      */
-    export enum Stepper {
+    enum Stepper {
         //% block="42"
         Ste1 = 1,
         //% block="28"
@@ -72,7 +72,7 @@ namespace motor {
     /**
      * The user can select the 8 steering gear controller.
      */
-    export enum Servos {
+    enum Servos {
         S1 = 0x08,
         S2 = 0x07,
         S3 = 0x06,
@@ -86,7 +86,7 @@ namespace motor {
     /**
      * The user selects the 4-way dc motor.
      */
-    export enum Motors {
+    enum Motors {
         M1 = 0x1,
         M2 = 0x2,
         M3 = 0x3,
@@ -106,7 +106,7 @@ namespace motor {
     /**
      * The user can select a two-path stepper motor controller.
      */
-    export enum Steppers {
+    enum Steppers {
         M1_M2 = 0x1,
         M3_M4 = 0x2
     }
@@ -169,26 +169,29 @@ namespace motor {
     }
 
 
-    function setStepper_28(index: number, dir: boolean): void {
-        if (index == 1) {
-            if (dir) {
+    function setStepper_28(index: Steppers, direction: Dir): void {
+        if (index == Steppers.M1_M2) {
+            if (direction == Dir.CW) {
                 setPwm(4, STP_CHA_L, STP_CHA_H);
                 setPwm(6, STP_CHB_L, STP_CHB_H);
                 setPwm(5, STP_CHC_L, STP_CHC_H);
                 setPwm(7, STP_CHD_L, STP_CHD_H);
             } else {
+                // CCW
                 setPwm(7, STP_CHA_L, STP_CHA_H);
                 setPwm(5, STP_CHB_L, STP_CHB_H);
                 setPwm(6, STP_CHC_L, STP_CHC_H);
                 setPwm(4, STP_CHD_L, STP_CHD_H);
             }
         } else {
-            if (dir) {
+            // M2-M3
+            if (direction == Dir.CW) {
                 setPwm(0, STP_CHA_L, STP_CHA_H);
                 setPwm(2, STP_CHB_L, STP_CHB_H);
                 setPwm(1, STP_CHC_L, STP_CHC_H);
                 setPwm(3, STP_CHD_L, STP_CHD_H);
             } else {
+                // CCW
                 setPwm(3, STP_CHA_L, STP_CHA_H);
                 setPwm(1, STP_CHB_L, STP_CHB_H);
                 setPwm(2, STP_CHC_L, STP_CHC_H);
@@ -228,8 +231,8 @@ namespace motor {
         if (!initialized) {
             initPCA9685()
         }
-        setStepper_28(0x1, direction == Dir.CW);
-        setStepper_28(0x2, direction != Dir.CW);
+        setStepper_28(Steppers.M1_M2, direction);
+        setStepper_28(Steppers.M3_M4, -direction);
         basic.pause(ms);
         motorStopAll();
     }

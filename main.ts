@@ -16,7 +16,7 @@
 /**
  *This is DFRobot:motor user motor and steering control function.
  */
-//% weight=10 color=#DF6721 icon="\uf304" block="Microturtle"
+//% weight=10 color=#DF6721 icon="\uf040" block="Microturtle"
 namespace motor {
     const PCA9685_ADDRESS = 0x40;
     const MODE1 = 0x00;

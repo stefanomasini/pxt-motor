@@ -265,8 +265,8 @@ namespace motor {
         if (!initialized) {
             initPCA9685()
         }
-        setStepper_28(Steppers.M1_M2, (direction === TurnDirection.Right) ? Dir.CW : Dir.CCW);
-        setStepper_28(Steppers.M3_M4, (direction === TurnDirection.Right) ? Dir.CW : Dir.CCW);
+        setStepper_28(Steppers.M1_M2, (direction === TurnDirection.Right) ? Dir.CCW : Dir.CW);
+        setStepper_28(Steppers.M3_M4, (direction === TurnDirection.Right) ? Dir.CCW : Dir.CW);
         basic.pause(ms);
         motorStopAll();
     }

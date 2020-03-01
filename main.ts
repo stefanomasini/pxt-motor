@@ -102,6 +102,20 @@ namespace motor {
         //% blockId="CCW" block="CCW"
         CCW = -1,
     }
+	
+    export enum WheelsDirection {
+        //% blockId="Forward" block="Forward"
+        Forward = 1,
+        //% blockId="Backward" block="Backward"
+        Backward = -1,
+    }
+
+    export enum TurnDirection {
+        //% blockId="Left" block="Left"
+        Left = 1,
+        //% blockId="Right" block="Right"
+        Right = -1,
+    }
 
     /**
      * The user can select a two-path stepper motor controller.
@@ -220,9 +234,6 @@ namespace motor {
     }
 
 
-    /**
-	 * Run wheels
-    */
     //% weight=50
     //% blockId=motor_wheels block="Wheels %direction ms %ms"
     //% direction.fieldEditor="gridpicker" direction.fieldOptions.columns=2
@@ -237,6 +248,29 @@ namespace motor {
         motorStopAll();
     }
 
+    //% weight=45
+    //% blockId=motor_wheels_turn block="Turn wheels %direction ms %ms"
+    //% direction.fieldEditor="gridpicker" direction.fieldOptions.columns=2
+    //% ms.min=0 ms.max=10000
+    export function wheels_turn(direction: TurnDirection, ms: number): void {
+        if (!initialized) {
+            initPCA9685()
+        }
+        setStepper_28(Steppers.M1_M2, (direction == TurnDirection.Right) ? Dir.CCW : Dir.CW);
+        setStepper_28(Steppers.M3_M4, (direction == TurnDirection.Right) ? Dir.CW : Dir.CCW);
+        basic.pause(ms);
+        motorStopAll();
+    }
+
+    //% weight=40
+    //% blockId=motor_move block="Move %direction %ms cm"
+    //% direction.fieldEditor="gridpicker" direction.fieldOptions.columns=2
+    //% ms.min=1 ms.max=20
+    export function move(direction: WheelsDirection, cm: number): void {
+        let ms = cm / 15.2 * 3000;  // Measured 15.2 cm in 3 seconds
+        let dir = direction == WheelsDirection.Forward ? Dir.CCW : Dir.CW;
+        wheels(dir, ms);
+    }
 
     function motorStop(index: Motors) {
         setPwm((4 - index) * 2, 0, 0);

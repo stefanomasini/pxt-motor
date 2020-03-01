@@ -285,7 +285,7 @@ namespace motor {
     //% blockId=motor_turn block="Turn %direction %deg degrees"
     //% direction.fieldEditor="gridpicker" direction.fieldOptions.columns=2
     //% deg.min=0 deg.max=360
-    export function turn(direction: WheelsDirection, deg: number): void {
+    export function turn(direction: TurnDirection, deg: number): void {
         let ms = deg / 692 * 10000;  // Measured 692 degrees in 10 seconds
         wheels_turn(direction, ms);
     }
@@ -302,7 +302,8 @@ namespace motor {
             let degree;
             if (position === PenPosition.Up) {
                 degree = 80;
-            } else if (position === PenPosition.Down) {
+            } else {
+                // position === PenPosition.Down
                 degree = 155;
             }
             servo(degree);

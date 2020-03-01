@@ -117,6 +117,15 @@ namespace motor {
         Right = -1,
     }
 
+    export enum PenPosition {
+        //% blockId="Down" block="Down"
+        Down = 1,
+        //% blockId="Up" block="Up"
+        Up = 2,
+        //% blockId="Out" block="Out"
+        Out = 3,
+    }
+	
     /**
      * The user can select a two-path stepper motor controller.
      */
@@ -220,7 +229,7 @@ namespace motor {
 	 * Pen up and down
 	*/
     //% blockId=motor_servo
-    //% weight=100
+    //% weight=50
     //% block="Servo %degree degree"
     //% degree.min=30 degree.max=155
     export function servo(degree: number): void {
@@ -234,7 +243,7 @@ namespace motor {
     }
 
 
-    //% weight=50
+    //% weight=40
     //% blockId=motor_wheels block="Wheels %direction ms %ms"
     //% direction.fieldEditor="gridpicker" direction.fieldOptions.columns=2
     //% ms.min=0 ms.max=10000
@@ -248,7 +257,7 @@ namespace motor {
         motorStopAll();
     }
 
-    //% weight=45
+    //% weight=30
     //% blockId=motor_wheels_turn block="Turn wheels %direction ms %ms"
     //% direction.fieldEditor="gridpicker" direction.fieldOptions.columns=2
     //% ms.min=0 ms.max=10000
@@ -256,20 +265,49 @@ namespace motor {
         if (!initialized) {
             initPCA9685()
         }
-        setStepper_28(Steppers.M1_M2, (direction == TurnDirection.Right) ? Dir.CW : Dir.CCW);
-        setStepper_28(Steppers.M3_M4, (direction == TurnDirection.Right) ? Dir.CW : Dir.CCW);
+        setStepper_28(Steppers.M1_M2, (direction === TurnDirection.Right) ? Dir.CW : Dir.CCW);
+        setStepper_28(Steppers.M3_M4, (direction === TurnDirection.Right) ? Dir.CW : Dir.CCW);
         basic.pause(ms);
         motorStopAll();
     }
 
-    //% weight=40
+    //% weight=100
     //% blockId=motor_move block="Move %direction %ms cm"
     //% direction.fieldEditor="gridpicker" direction.fieldOptions.columns=2
     //% ms.min=1 ms.max=20
     export function move(direction: WheelsDirection, cm: number): void {
         let ms = cm / 15.2 * 3000;  // Measured 15.2 cm in 3 seconds
-        let dir = direction == WheelsDirection.Forward ? Dir.CCW : Dir.CW;
+        let dir = (direction === WheelsDirection.Forward) ? Dir.CCW : Dir.CW;
         wheels(dir, ms);
+    }
+
+    //% weight=90
+    //% blockId=motor_turn block="Turn %direction %deg degrees"
+    //% direction.fieldEditor="gridpicker" direction.fieldOptions.columns=2
+    //% deg.min=0 deg.max=360
+    export function turn(direction: WheelsDirection, deg: number): void {
+        let ms = deg / 692 * 10000;  // Measured 692 degrees in 10 seconds
+        wheels_turn(direction, ms);
+    }
+
+    //% weight=80
+    //% blockId=motor_pen block="Pen %position"
+    //% position.fieldEditor="gridpicker" direction.fieldOptions.columns=1
+    export function pen(position: PenPosition): void {
+        if (position === PenPosition.Out) {
+            servo(30);
+            basic.pause(2000);
+            servo(80);
+        } else {
+            let degree;
+            if (position === PenPosition.Up) {
+                degree = 80;
+            } else if (position === PenPosition.Down) {
+                degree = 155;
+            }
+            servo(degree);
+            basic.pause(500);
+        }
     }
 
     function motorStop(index: Motors) {
